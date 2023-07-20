@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './app.module.scss';
-
+import HomePage from './home';
 import NxWelcome from './nx-welcome';
 
 import { Route, Routes, Link } from 'react-router-dom';
@@ -8,12 +8,13 @@ import { Route, Routes, Link } from 'react-router-dom';
 export function App() {
   return (
     <div>
-      <NxWelcome title="frontend" />
+      {/* <NxWelcome title="frontend" /> */}
+      <HomePage />
 
       {/* START: routes */}
       {/* These routes and navigation have been generated for you */}
       {/* Feel free to move and update them to fit your needs */}
-      <br />
+      {/* <br />
       <hr />
       <br />
       <div role="navigation">
@@ -44,7 +45,7 @@ export function App() {
             </div>
           }
         />
-      </Routes>
+      </Routes> */}
       {/* END: routes */}
     </div>
   );
