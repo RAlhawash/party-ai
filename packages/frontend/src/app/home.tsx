@@ -41,7 +41,7 @@ export function HomePage() {
   const [date, setDate] = useState<Date>(new Date());
   // const [invitees, setInvitees] = useState<string>('');
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [location, setLocation] = useState<string>('');
+  // const [location, setLocation] = useState<string>('');
 
   const [plan, setPlan] = useState<string>('');
 
@@ -93,13 +93,29 @@ export function HomePage() {
     fetchOptions().catch(console.error);
   }, [themeOptions]);
 
-  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    switch (e.currentTarget.name) {
-      case 'location':
-        setLocation(e.currentTarget.value);
-        break;
+  const fetchPlan = async () => {
+    const url = 'http://localhost:3000/api/party-plans';
+
+    const guests = contacts.map((contact) => {
+      return { name: contact.name, email: contact.email };
+    });
+
+    const res = await axios.post(url, { theme: theme?.value, guests: guests });
+
+    if (res?.data) {
+      // loop through the data and set the options
+
+      setPlan(res.data);
     }
   };
+
+  // const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   switch (e.currentTarget.name) {
+  //     case 'location':
+  //       setLocation(e.currentTarget.value);
+  //       break;
+  //   }
+  // };
 
   const handleSubmit = async (e: React.FormEvent<PartyForm>) => {
     e.preventDefault();
@@ -119,13 +135,15 @@ export function HomePage() {
     };
 
     setIsPreview(true);
+
+    fetchPlan();
   };
 
   const resetForm = () => {
     // Reset field values
     setTheme(null);
     setDate(new Date());
-    setLocation('');
+    // setLocation('');
 
     setIsPreview(false);
   };
@@ -166,8 +184,8 @@ export function HomePage() {
                   {formatISO(date, { representation: 'date' })}
                 </p>
 
-                <p>Location:</p>
-                <p className="pb-8">{location}</p>
+                {/* <p>Location:</p>
+                <p className="pb-8">{location}</p> */}
 
                 <p>Plan:</p>
                 <p className="pb-8">{plan}</p>
@@ -273,7 +291,7 @@ export function HomePage() {
           </section>
 
           {/* Where */}
-          <section className="grid grid-cols-2 my-24 bg-slate-100 rounded-md p-8 shadow-xl">
+          {/* <section className="grid grid-cols-2 my-24 bg-slate-100 rounded-md p-8 shadow-xl">
             <h2 className="flex items-center text-5xl font-bold">
               Step 4: Where
             </h2>
@@ -286,7 +304,7 @@ export function HomePage() {
                 value={location}
               />
             </div>
-          </section>
+          </section> */}
 
           <div className="flex justify-center">
             <button
