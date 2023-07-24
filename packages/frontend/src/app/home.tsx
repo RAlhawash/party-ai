@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { formatISO } from 'date-fns';
 
-
 import 'react-datepicker/dist/react-datepicker.css';
 import InputComponent, { InputComponentType } from './input';
 
@@ -12,6 +11,13 @@ export function HomePage() {
   interface Option {
     label: string;
     value: number;
+  }
+
+  interface Contact {
+    id: number;
+    name: string;
+    email: string;
+    value?: boolean;
   }
 
   interface FormElements extends HTMLFormControlsCollection {
@@ -33,23 +39,54 @@ export function HomePage() {
 
   // The party date.
   const [date, setDate] = useState<Date>(new Date());
-  const [invitees, setInvitees] = useState<string>('');
+  // const [invitees, setInvitees] = useState<string>('');
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [location, setLocation] = useState<string>('');
+
+  const [plan, setPlan] = useState<string>('');
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      // TODO: Get API URL to fetch party themes.
+      const url = 'http://localhost:3000/api/contacts';
+
+      const res = await axios.get(url);
+      if (res?.data) {
+        // setContacts(res.data.options);
+        // loop through the data and set the options
+        const contacts: Contact[] = res.data.map((contact: Contact) => {
+          return {
+            id: contact.id,
+            name: contact.name,
+            email: contact.email,
+            value: true,
+          };
+        });
+        setContacts(contacts);
+      }
+    };
+    fetchContacts().catch(console.error);
+  }, [contacts]);
 
   useEffect(() => {
     const fetchOptions = async () => {
-      const url = "http://localhost:3000/api/themes"
+      const url = 'http://localhost:3000/api/themes';
 
       if (themeOptions.length < 1) {
         // TODO: Call API to set options
         const res = await axios.get(url);
         if (res?.data) {
-        // loop through the data and set the options
-        const options: Option[] = res.data.map((theme: any, index: number) => {
-          return { label: theme.name, value: index + 1, description: theme.description };
-        });
-        setThemeOptions(options);
-
+          // loop through the data and set the options
+          const options: Option[] = res.data.map(
+            (theme: any, index: number) => {
+              return {
+                label: theme.name,
+                value: index + 1,
+                description: theme.description,
+              };
+            }
+          );
+          setThemeOptions(options);
         }
       }
     };
@@ -60,9 +97,6 @@ export function HomePage() {
     switch (e.currentTarget.name) {
       case 'location':
         setLocation(e.currentTarget.value);
-        break;
-      case 'invitees':
-        setInvitees(e.currentTarget.value);
         break;
     }
   };
@@ -89,13 +123,14 @@ export function HomePage() {
 
   const resetForm = () => {
     // Reset field values
-    setInvitees('');
     setTheme(null);
     setDate(new Date());
     setLocation('');
 
     setIsPreview(false);
   };
+
+  const [checkedAll, setCheckedAll] = useState(true);
 
   return (
     <div className="container mx-auto p-24 text-slate-600">
@@ -113,7 +148,15 @@ export function HomePage() {
               </h3>
               <div className="grid grid-cols-2 text-lg">
                 <p>Guests:</p>
-                <p className="pb-8">{invitees}</p>
+                <div className="pb-8">
+                  {contacts?.map((contact, i) => {
+                    return (
+                      <div key={i} className="text-lg ">
+                        <label className="">{contact.name}</label>
+                      </div>
+                    );
+                  })}
+                </div>
 
                 <p>Theme:</p>
                 <p className="pb-8">{theme?.label}</p>
@@ -125,6 +168,9 @@ export function HomePage() {
 
                 <p>Location:</p>
                 <p className="pb-8">{location}</p>
+
+                <p>Plan:</p>
+                <p className="pb-8">{plan}</p>
               </div>
             </div>
           </section>
@@ -152,13 +198,41 @@ export function HomePage() {
               Step 1: Who
             </h2>
             <div>
-              <InputComponent
+              {/* <InputComponent
                 inputName={'invitees'}
                 label={'Enter email addresses of your invitees'}
                 onChange={changeHandler}
                 type={InputComponentType.textArea}
                 value={invitees}
-              />
+              /> */}
+              <div className="text-lg">
+                <input
+                  id="selectAll"
+                  type="checkbox"
+                  className="mr-4"
+                  checked={checkedAll}
+                  onChange={(event) => setCheckedAll(event.target.checked)}
+                />
+                <label htmlFor={'selectAll'} className="">
+                  Select All
+                </label>
+              </div>
+              {contacts?.map((contact, i) => {
+                return (
+                  <div key={i} className="text-lg ">
+                    <input
+                      id={`contact-${i}`}
+                      type="checkbox"
+                      className="mr-4"
+                      checked={contact.value}
+                      onChange={() => (contact.value = !contact.value)}
+                    />
+                    <label htmlFor={`contact-${i}`} className="">
+                      {contact.name}
+                    </label>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
