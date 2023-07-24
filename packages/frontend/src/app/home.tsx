@@ -100,7 +100,7 @@ export function HomePage() {
       return { name: contact.name, email: contact.email };
     });
 
-    const res = await axios.post(url, { theme: theme?.value, guests: guests });
+    const res = await axios.post(url, { theme: theme?.label, guests: guests });
 
     if (res?.data) {
       // loop through the data and set the options
@@ -139,13 +139,25 @@ export function HomePage() {
     fetchPlan();
   };
 
-  const resetForm = () => {
+  const resetForm = async () => {
+
+    const url = 'http://localhost:3000/api/send-invites';
+
+    const guests = contacts.map((contact) => {
+      return { name: contact.name, email: contact.email };
+    });
+
+    const res = await axios.post(url, { guests, plan, date });
+
+
     // Reset field values
     setTheme(null);
     setDate(new Date());
     // setLocation('');
 
     setIsPreview(false);
+
+
   };
 
   const [checkedAll, setCheckedAll] = useState(true);
