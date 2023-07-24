@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { formatISO } from 'date-fns';
 
+
 import 'react-datepicker/dist/react-datepicker.css';
 import InputComponent, { InputComponentType } from './input';
 
@@ -37,22 +38,19 @@ export function HomePage() {
 
   useEffect(() => {
     const fetchOptions = async () => {
-      // TODO: Get API URL to fetch party themes.
-      const url = '';
+      const url = "http://localhost:3000/api/themes"
 
       if (themeOptions.length < 1) {
         // TODO: Call API to set options
-        // const res = await axios.get(url);
-        // if (res?.data) {
-        //   setThemeOptions(res.data.options);
-        // }
-
-        const options: Option[] = [
-          { label: 'Option 1', value: 1 },
-          { label: 'Option 2', value: 2 },
-          { label: 'Option 3', value: 3 },
-        ];
+        const res = await axios.get(url);
+        if (res?.data) {
+        // loop through the data and set the options
+        const options: Option[] = res.data.map((theme: any, index: number) => {
+          return { label: theme.name, value: index + 1, description: theme.description };
+        });
         setThemeOptions(options);
+
+        }
       }
     };
     fetchOptions().catch(console.error);
@@ -195,6 +193,7 @@ export function HomePage() {
                 id="date"
                 selected={date}
                 onChange={(date: Date) => setDate(date)}
+                minDate={new Date()}
               />
             </div>
           </section>
